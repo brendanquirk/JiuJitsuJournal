@@ -28,7 +28,7 @@ app.use(express.json())
 app.use('/api/users', userRoutes)
 
 app.get('/', (req: express.Request, res: express.Response) => {
-  res.send('Hello World!')
+  res.redirect('/api/users')
 })
 
 app.listen(port, () => {
