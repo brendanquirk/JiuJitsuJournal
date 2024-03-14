@@ -31,7 +31,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await UserAuth.find()
-    res.status(200).json(users)
+    // res.status(200).json(users)
     res.send(users)
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch users' })
@@ -39,16 +39,31 @@ export const getAllUsers = async (req: Request, res: Response) => {
 }
 
 // Get user by ID
+
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params
+  const { password } = req.body
+  console.log(req.body)
+
   try {
     const user = await UserAuth.findById(id)
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
-    res.status(200).json(user)
+
+    // Compare the provided password with the hashed password stored in the database
+    console.log(password, user.password)
+    const passwordMatch = await bcrypt.compare(password, user.password)
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Invalid password' })
+    }
+
+    // If password matches, send the user data
     res.send(user)
   } catch (error) {
+    console.error('Error fetching user:', error)
     res.status(500).json({ error: 'Failed to fetch user' })
   }
 }
